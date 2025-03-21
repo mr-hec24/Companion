@@ -10,9 +10,18 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
+  // Redirect to onboarding if session exists but user_metadata indicates onboarding is not complete
+  if (
+    session && 
+    !session.user.user_metadata.hasCompletedOnboarding && 
+    !req.nextUrl.pathname.startsWith('/protected/onboarding')
+  ) {
+    return NextResponse.redirect(new URL('/protected/onboarding', req.url))
+  }
+
   // Redirect to login if no session
-  if (!session && req.nextUrl.pathname !== '/login') {
-    return NextResponse.redirect(new URL('/login', req.url))
+  if (!session && req.nextUrl.pathname !== '/auth/login') {
+    return NextResponse.redirect(new URL('/auth/login', req.url))
   }
 
   return res

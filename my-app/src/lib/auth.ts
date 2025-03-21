@@ -1,22 +1,30 @@
 import { supabase } from './supabase'
 
-export async function signUp(email: string, password: string) {
-  const { data, error } = await supabase.auth.signUp({
+export async function signUp(email: string, password: string, name: string) {
+  return await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data : {
+        name: name || '',
+      }
+    }
   })
-  return { user: data.user, error }
 }
 
 export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
+  return await supabase.auth.signInWithPassword({
     email,
     password,
   })
-  return { user: data.user, error }
+}
+
+export async function resetPassword(email: string) {
+  return await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/auth/update-password`
+  })
 }
 
 export async function signOut() {
-  const { error } = await supabase.auth.signOut()
-  return error
+  return await supabase.auth.signOut()
 }
